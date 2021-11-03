@@ -1,15 +1,23 @@
 package com.ReadExcelToMonth.V1.service;
 
 import com.ReadExcelToMonth.V1.bean.NativeInBean;
+import com.ReadExcelToMonth.V1.bean.OtherThing;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ReadService {
+    public OtherThing o;
+
     //讀取Excel
     public Workbook getWorkbook(String path) {
 
@@ -17,6 +25,11 @@ public class ReadService {
         if (path == null)
             return null;
         String extString = path.substring(path.lastIndexOf(".")+1);
+        //想用這個取得天數,以後可能可以改放controller
+        String date = path.substring(path.lastIndexOf("_")+1,path.lastIndexOf("v1"));
+        o = new OtherThing();
+        o.setDate(date);
+
         InputStream is;
         try {
             is = new FileInputStream(path);
