@@ -4,6 +4,7 @@ import com.ReadExcelToMonth.V1.bean.NativeInBean;
 import com.ReadExcelToMonth.V1.bean.OtherThing;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ public class ReadService {
         o.setDate(date);
 
         InputStream is;
+
         try {
             is = new FileInputStream(path);
             if ("xls".equals(extString)) {
