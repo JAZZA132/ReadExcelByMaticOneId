@@ -37,7 +37,7 @@ public class ReadExcelToMonthApplication {
 		for (int i = 0; i < list1.length; i++) {
 			wb =a.getWorkbook("D:\\sideproject\\ReadExcelToMonth\\MonthExcel\\" + list1[i]);
 			List<List<String>> tt = a.readFields(wb,0,2,4,10);
-			tt.stream().forEach(p-> System.out.println(p));
+//			tt.stream().forEach(p-> System.out.println(p));
 		}
 
 //		wb =a.getWorkbook("D:\\sideproject\\ReadExcelToMonth\\MonthExcel\\通關統計表_20211001v1.xlsx");

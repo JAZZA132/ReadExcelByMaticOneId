@@ -1,6 +1,7 @@
 package com.ReadExcelToMonth.V1.service;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
@@ -8,7 +9,9 @@ import org.apache.poi.xssf.usermodel.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WriteExcel implements AutoCloseable{
     private List<String> columnName;
@@ -30,6 +33,16 @@ public class WriteExcel implements AutoCloseable{
         wb = writeData();
         return wb;
     }
+
+    public List<String> getDate(String[] list1){
+        List<String> date  = new ArrayList<>();
+        for(int i = 0;i<list1.length;i++){
+            String newdate = list1[i].substring(10,14);
+            date.add(newdate);
+        }
+        return date;
+    };
+
 
     public static SXSSFWorkbook writeData(){
         //1.创建一个workbook,对应一个Excel文件
@@ -60,12 +73,15 @@ public class WriteExcel implements AutoCloseable{
 
         //4.2单元格信息设置
         Cell cell=row.createCell((short)0);
-        cell.setCellValue("日期");
+        cell.setCellValue("地點");
         cell.setCellStyle(style);
         cell = row.createCell((short)1);
-        cell.setCellValue("mrp");
+        cell.setCellValue("閘數");
         cell.setCellStyle(style);
         cell = row.createCell((short)2);
+        cell.setCellValue("出入境");
+        //合併表格
+        sheet.addMergedRegion(new CellRangeAddress(1,1,1,4));
 
         return wb;
     }
