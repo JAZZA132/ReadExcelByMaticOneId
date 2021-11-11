@@ -1,20 +1,33 @@
 package com.ReadExcelToMonth.V1.bean;
 
-public class NativeOutBean {
+import java.util.List;
+
+public class NativeBean {
+
     private int nativeSuccess;
     private int nativeFail;
     private int totalNative;
     private int todayNativeSuccess;
     private int todayNativeFail;
+    private List<String> nativePeople;
+
+    public List<String> getNativePeople() {
+        return nativePeople;
+    }
+
+    public void setNativePeople(List<String> nativePeople) {
+        this.nativePeople = nativePeople;
+    }
 
     @Override
     public String toString() {
-        return "NativeOutBean{" +
+        return "NativeBean{" +
                 "nativeSuccess=" + nativeSuccess +
                 ", nativeFail=" + nativeFail +
                 ", totalNative=" + totalNative +
                 ", todayNativeSuccess=" + todayNativeSuccess +
                 ", todayNativeFail=" + todayNativeFail +
+                ", nativePeople=" + nativePeople +
                 '}';
     }
 

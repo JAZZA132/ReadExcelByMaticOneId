@@ -19,39 +19,128 @@ public class WriteExcel implements AutoCloseable{
     private String sheetName = "月份";
     private SXSSFWorkbook wb;
     private SXSSFSheet sheet;
-
-
+    private CellStyle style;
+    private Cell cell;
+    private Row row;
+    //抓取現在的格子位置
+    private int rowNow = 0;
+    //放地點 PS 小心讀取的資料少一欄
+    public String[] place = new String[]{"台北松山機場","","金門港","","桃園機場第一航廈","","桃園機場第二航廈","","高雄小港機場",""};
+    //放閘數
+    public String[] gate = new String[]{"2","2","3"," ","3","7","4","8","2","2"};
+    //放tj 出入境
+    public String[] in_out = new String[]{"入境","出境","出境"," ","入境","出境","入境","出境","入境","出境"};
 
 
     public WriteExcel(SXSSFWorkbook wb) {
         this.wb = wb;
     }
 
-    public SXSSFWorkbook creatExcel() throws Exception{
-
-        sheet = wb.createSheet(sheetName);
-        wb = writeData();
+    public SXSSFWorkbook creatExcel(String[] list1,List<List<List<String>>> data) throws Exception{
+        //1.创建一个workbook,对应一个Excel文件
+        wb= new SXSSFWorkbook();
+        //2.在workbook中添加一个sheet,对应Excel文件中的sheet
+        sheet=wb.createSheet(sheetName);
+        creatStyle();
+        creatTitle();
+        writeData(list1,data);
         return wb;
     }
 
+    //取日期
     public List<String> getDate(String[] list1){
         List<String> date  = new ArrayList<>();
         for(int i = 0;i<list1.length;i++){
             String newdate = list1[i].substring(10,14);
-            date.add(newdate);
+            StringBuilder bf = new StringBuilder(newdate);
+            bf.insert(2,"/");
+            date.add(bf.toString());
         }
         return date;
     };
 
 
-    public static SXSSFWorkbook writeData(){
-        //1.创建一个workbook,对应一个Excel文件
-        SXSSFWorkbook wb= new SXSSFWorkbook();
-        //2.在workbook中添加一个sheet,对应Excel文件中的sheet
-        Sheet sheet=wb.createSheet("ONEID資料表");
-        sheet.setColumnWidth(0, 3766);
+    public void creatTitle(){
         //3.在sheet中添加表头第0行
-        Row row= sheet.createRow((int)2);
+
+        rowNow += 1;
+        row= sheet.createRow((int)rowNow);
+        sheet.addMergedRegion(new CellRangeAddress(1,1,0,2));
+        cell=row.createCell((short)0);
+        cell.setCellValue("國人成功數量");
+
+
+
+
+        //地點等固定資料
+        sheet.addMergedRegion(new CellRangeAddress(3,4,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(5,6,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(7,8,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(9,10,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(11,12,0,0));
+        rowNow+=2;
+        int placecount = 3;
+        for(int i = 0;i<place.length;i++){
+            row= sheet.createRow((int)i+rowNow);
+            //從第三格開始
+            if(i+3 == placecount){
+                cell=row.createCell((short)0);
+                cell.setCellValue(place[i]);
+                placecount += 2;
+            }
+
+            cell=row.createCell((short)1);
+            cell.setCellValue(gate[i]);
+            cell=row.createCell((short)2);
+            cell.setCellValue(in_out[i]);
+
+        }
+
+    }
+
+
+    public  SXSSFWorkbook writeData(String[] list1,List<List<List<String>>> data){
+        row= sheet.createRow(2);
+        //4.2单元格信息设置
+        cell=row.createCell((short)0);
+        cell.setCellValue("地點");
+        cell.setCellStyle(style);
+        cell = row.createCell((short)1);
+        cell.setCellValue("閘數");
+        cell.setCellStyle(style);
+        cell = row.createCell((short)2);
+        cell.setCellValue("出入境");
+
+        //格子寬度
+        sheet.setColumnWidth(0, 5000);
+        //放日期
+        List<String> date = getDate(list1);
+        for(int i =0;i<date.size();i++){
+            cell=row.createCell((short)i+3);
+            cell.setCellValue(date.get(i));
+        }
+//        data.stream().forEach(p-> System.out.println(p));
+        //放資料
+        int datarow = 0;
+        int peopleSum = 0;
+        for(int i =0;i<place.length;i++){
+            row = sheet.getRow(i+3);
+            if(i != 3){
+                for(int z =0;z<list1.length;z++){
+                    cell=row.createCell((short)z+3);
+                    cell.setCellValue(Float.valueOf(data.get(z).get(datarow).get(0)));
+                    peopleSum += Float.valueOf(data.get(z).get(datarow).get(0));
+                    }
+                datarow++;
+                }
+
+        }
+
+        return wb;
+    }
+
+
+    public void creatStyle(){
         //4.创建单元格,并且设置表头,设置表头居中
         CellStyle style=wb.createCellStyle();
         Font font = wb.createFont();
@@ -68,26 +157,7 @@ public class WriteExcel implements AutoCloseable{
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
-
-
-
-        //4.2单元格信息设置
-        Cell cell=row.createCell((short)0);
-        cell.setCellValue("地點");
-        cell.setCellStyle(style);
-        cell = row.createCell((short)1);
-        cell.setCellValue("閘數");
-        cell.setCellStyle(style);
-        cell = row.createCell((short)2);
-        cell.setCellValue("出入境");
-        //合併表格
-        sheet.addMergedRegion(new CellRangeAddress(1,1,1,4));
-
-        return wb;
     }
-
-
-
 
     @Override
     public void close() throws Exception {
