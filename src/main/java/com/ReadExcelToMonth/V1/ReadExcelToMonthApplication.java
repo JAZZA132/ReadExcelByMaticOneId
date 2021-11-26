@@ -29,7 +29,9 @@ public class ReadExcelToMonthApplication {
 
 
 	public static void main(String[] args) throws Exception {
-		File folder1 = new File("D:\\sideproject\\ReadExcelToMonth\\MonthExcel"); 
+		String path = "D:\\SideProject\\ReadExcelByMaticOneId";
+
+		File folder1 = new File(path + "\\MonthExcel");
 		String[] list1 = folder1.list(); //讀取資料夾所有檔案名稱
 		ReadService a = new ReadService();
 		Workbook wb = null;
@@ -39,7 +41,7 @@ public class ReadExcelToMonthApplication {
 		List<List<List<String>>> listdata = new ArrayList();
 
 		for (int i = 0; i < list1.length; i++) {
-			wb =a.getWorkbook("D:\\sideproject\\ReadExcelToMonth\\MonthExcel\\" + list1[i]);
+			wb =a.getWorkbook(path +"\\MonthExcel\\" + list1[i]);
 			tt = a.readFields(wb,0,3,4,10);
 			listdata.add(tt);
 		}
@@ -51,7 +53,7 @@ public class ReadExcelToMonthApplication {
 		SXSSFWorkbook ww = new SXSSFWorkbook((XSSFWorkbook) wb);
 		WriteExcel writeExcel = new WriteExcel(ww);
 		ww = writeExcel.creatExcel(list1,listdata);
-		OutputStream f = new FileOutputStream("D:\\sideproject\\ReadExcelToMonth\\123.xlsx");
+		OutputStream f = new FileOutputStream(path + "\\123.xlsx");
 		ww.write(f);
 		ww.close();
 	}

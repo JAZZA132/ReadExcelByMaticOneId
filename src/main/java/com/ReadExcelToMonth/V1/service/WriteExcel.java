@@ -24,6 +24,7 @@ public class WriteExcel implements AutoCloseable{
     private Row row;
     //抓取現在的格子位置
     private int rowNow = 0;
+    private int placecount = 3;
     //放地點 PS 小心讀取的資料少一欄
     public String[] place = new String[]{"台北松山機場","","金門港","","桃園機場第一航廈","","桃園機場第二航廈","","高雄小港機場",""};
     //放閘數
@@ -42,8 +43,16 @@ public class WriteExcel implements AutoCloseable{
         //2.在workbook中添加一个sheet,对应Excel文件中的sheet
         sheet=wb.createSheet(sheetName);
         creatStyle();
-        creatTitle();
-        writeData(list1,data);
+        creatTitle("國人成功數量");
+        //第三參數是現在 list1,List<List<List<String>>> data 要取哪格的資料
+        writeData(list1,data,0);
+        creatTitle("外人成功數量");
+        writeData(list1,data,1);
+        //原data資料中間有一筆資料是加總所以多+1
+        creatTitle("國人失敗數量");
+        writeData(list1,data,3);
+        creatTitle("外人失敗數量");
+        writeData(list1,data,4);
         return wb;
     }
 
@@ -60,30 +69,26 @@ public class WriteExcel implements AutoCloseable{
     };
 
 
-    public void creatTitle(){
+    public void creatTitle(String rowname){
         //3.在sheet中添加表头第0行
 
         rowNow += 1;
         row= sheet.createRow((int)rowNow);
-        sheet.addMergedRegion(new CellRangeAddress(1,1,0,2));
+        sheet.addMergedRegion(new CellRangeAddress(rowNow,rowNow,0,2));
         cell=row.createCell((short)0);
-        cell.setCellValue("國人成功數量");
-
-
-
+        cell.setCellValue(rowname);
 
         //地點等固定資料
-        sheet.addMergedRegion(new CellRangeAddress(3,4,0,0));
-        sheet.addMergedRegion(new CellRangeAddress(5,6,0,0));
-        sheet.addMergedRegion(new CellRangeAddress(7,8,0,0));
-        sheet.addMergedRegion(new CellRangeAddress(9,10,0,0));
-        sheet.addMergedRegion(new CellRangeAddress(11,12,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(rowNow+2,rowNow+3,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(rowNow+4,rowNow+5,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(rowNow+6,rowNow+7,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(rowNow+8,rowNow+9,0,0));
+        sheet.addMergedRegion(new CellRangeAddress(rowNow+10,rowNow+11,0,0));
         rowNow+=2;
-        int placecount = 3;
         for(int i = 0;i<place.length;i++){
             row= sheet.createRow((int)i+rowNow);
-            //從第三格開始
-            if(i+3 == placecount){
+            //從第三格開始,加入rowNow讓他判斷第二次呼叫此方法row位置
+            if(rowNow+i == placecount){
                 cell=row.createCell((short)0);
                 cell.setCellValue(place[i]);
                 placecount += 2;
@@ -99,8 +104,8 @@ public class WriteExcel implements AutoCloseable{
     }
 
 
-    public  SXSSFWorkbook writeData(String[] list1,List<List<List<String>>> data){
-        row= sheet.createRow(2);
+    public  SXSSFWorkbook writeData(String[] list1,List<List<List<String>>> data,int dataplace){
+        row= sheet.createRow(rowNow -1 );
         //4.2单元格信息设置
         cell=row.createCell((short)0);
         cell.setCellValue("地點");
@@ -124,18 +129,20 @@ public class WriteExcel implements AutoCloseable{
         int datarow = 0;
         int peopleSum = 0;
         for(int i =0;i<place.length;i++){
-            row = sheet.getRow(i+3);
+            row = sheet.getRow(i+rowNow);
             if(i != 3){
                 for(int z =0;z<list1.length;z++){
                     cell=row.createCell((short)z+3);
-                    cell.setCellValue(Float.valueOf(data.get(z).get(datarow).get(0)));
-                    peopleSum += Float.valueOf(data.get(z).get(datarow).get(0));
+                    cell.setCellValue(Float.valueOf(data.get(z).get(datarow).get(dataplace)));
+                    peopleSum += Float.valueOf(data.get(z).get(datarow).get(dataplace));
                     }
                 datarow++;
                 }
 
         }
 
+        rowNow += 11;
+        placecount+=4;
         return wb;
     }
 
